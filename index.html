@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Stampede Detector</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Stampede Detection Dashboard</h1>
+
+    <div class="status-box" id="statusBox">
+      <h2>Crowd Count: <span id="crowdCount">--</span></h2>
+      <p id="alertText">Waiting for data...</p>
+    </div>
+
+    <h2>Live Webcam Feed</h2>
+    <img src="{{ url_for('video_feed') }}" alt="Live Webcam Feed" width="640" height="480">
+
+  </div>
+
+  <script>
+    async function fetchCrowdData() {
+      try {
+        const response = await fetch('/api/crowd');
+        const data = await response.json();
+        document.getElementById('crowdCount').textContent = data.count;
+
+        const alertText = document.getElementById('alertText');
+        const statusBox = document.getElementById('statusBox');
+        
+        if (data.count > 15) {
+          alertText.textContent = "⚠️ Possible Stampede!";
+          statusBox.style.backgroundColor = "#ff4d4d";
+        } else {
+          alertText.textContent = "✅ Crowd Under Control";
+          statusBox.style.backgroundColor = "#b3ffb3";
+        }
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      }
+    }
+
+    setInterval(fetchCrowdData, 2000); // Poll every 2 seconds
+    fetchCrowdData();
+  </script>
+</body>
+</html>
