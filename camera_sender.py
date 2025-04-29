@@ -1,9 +1,9 @@
 import cv2
-import requests
 import time
+import os
 
-# Change this if your WSL IP is different
-WSL_SERVER_URL = 'http://localhost:5000/frame'
+# Change this path to a shared directory both Windows and WSL can access
+save_path = "C:\\Users\\Nayana\\frame.jpg"
 
 cap = cv2.VideoCapture(0)
 
@@ -17,14 +17,19 @@ while True:
         print("Failed to grab frame")
         break
 
-    # Resize to reduce data size if needed
+    # Resize to a manageable size
     frame = cv2.resize(frame, (640, 480))
 
-    # Encode frame as JPEG
-    _, img_encoded = cv2.imencode('.jpg', frame)
-    response = requests.post(WSL_SERVER_URL, files={'image': img_encoded.tobytes()})
+    # Save the frame
+    cv2.imwrite(save_path, frame)
+    print("Frame saved.")
 
-    print(f"Status: {response.status_code}")
-    time.sleep(0.1)  # optional: reduce spam
+    # Optional: show it on Windows too
+    # cv2.imshow("Windows View", frame)
+    # if cv2.waitKey(1) & 0xFF == ord('q'):
+    #     break
+
+    time.sleep(0.1)  # Adjust as needed
 
 cap.release()
+# cv2.destroyAllWindows()
